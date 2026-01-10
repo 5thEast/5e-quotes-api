@@ -1,5 +1,32 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { query } from "./_generated/server";
+
+export const latest = query({
+  args: { limit: v.number() },
+  handler: async (ctx, { limit }) => {
+    return await ctx.db
+      .query("quotes")
+      .withIndex("by_createdAt")
+      .order("desc")
+      .take(limit);
+  },
+});
+
+export const random = query({
+  args: {},
+  handler: async (ctx) => {
+    const pool = await ctx.db
+      .query("quotes")
+      .withIndex("by_createdAt")
+      .order("desc")
+      .take(200);
+
+    if (pool.length === 0) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  },
+});
+
 
 export const add = mutation({
   args: {
