@@ -53,6 +53,22 @@ http.route({
     }),
 });
 
+// GET /leaderboard/top
+http.route({
+  path: "/leaderboard/top",
+  method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    requireSecret(req); // the same helper you use for quotes
+
+    const url = new URL(req.url);
+    const limit = Math.min(Number(url.searchParams.get("limit") ?? "20") || 20, 100);
+
+    const rows = await ctx.runQuery(api.leaderboard.top, { limit });
+    return Response.json({ rows });
+  }),
+});
+
+
 
 function pickQuote(text: string): string | undefined {
     // Normalize, split to lines
